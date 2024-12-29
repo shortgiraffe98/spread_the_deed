@@ -1,0 +1,169 @@
+scalar Date    
+
+    type User {
+        id: Int
+        username: String
+        email: String
+        donate_history: [Donation]
+        avatar: String
+        profile_image: String
+        my_campaigns: [Campaign]
+        lastname: String
+        firstname: String
+        country: String
+        city: String
+        about_me: String
+        short_description: String
+    }
+
+    input UserInput {
+        user_id: Int!
+        email: String
+        avatar: String
+        profile_image: String
+        city: String
+        country: String
+        short_description: String
+        about_me: String
+        password: String
+    }
+
+    type UserPublic {
+        city: String
+        country: String
+        id: Int
+        username: String
+        avatar: String
+        profile_image: String
+        my_campaigns: [Campaign]
+        lastname: String
+        firstname: String
+        about_me: String
+        short_description: String
+        contributions_counter: Int
+        campaigns_counter: Int
+        comments_counter: Int
+    }
+
+    type Donation {
+        campaign_id: Int!
+        amount: Float!
+        user_id: Int!
+        createdAt: Date!
+        creator_checked: Boolean!
+        getUser: UserPublic
+    }
+
+    type Comment {
+        user_id: Int!
+        comment: String!
+        createdAt: Date!
+        get_avatar: String
+        get_fullname: String
+    }
+
+    input CommentInput {
+        user_id: Int!
+        comment: String!
+        campaign_id: Int!
+    }
+
+    type CampaignImage {
+        campaign_id: ID!
+        base64_image: String!
+    }
+
+    input CampaignInput {
+        title: String!
+        description: String!
+        goal_amount: Float!
+        raised_amount: Float!
+        start_date: Date!
+        end_date: Date!
+        status: String!
+        user_id: Int!
+    }
+
+    input PerkInput {
+        title: String!
+        amount: Float!
+        base64_image: String!
+    }
+
+    type Perk {
+        id: Int!
+        title: String!
+        amount: Float!
+        base64_image: String!
+        campaign_id: Int!
+    }
+
+    type Campaign {
+        id: Int!
+        title: String!
+        description: String!
+        goal_amount: Float!
+        raised_amount: Float!
+        start_date: Date!
+        end_date: Date!
+        status: String!
+        user_id: Int!
+        createdAt: Date!
+        updatedAt: Date!
+        get_images: [String]
+        get_perks: [Perk]
+        get_donations: [Donation]
+        get_comments: [Comment]
+        comments_counter: Int!
+    }
+
+    type Message {
+        from: String
+        body: String
+    }
+
+    type Register {
+        data: User
+        error: String
+    }
+
+    type Login {
+        token: String
+        error: String
+    }
+
+    type DefaultResponse {
+        message: String
+        error: String
+    }
+
+    type Query {
+        user: User
+        users: [User]
+        donate_history: [Donation]
+        campaign_images(campaign_id: ID!): [CampaignImage]
+        campaign(campaign_id: Int!): Campaign
+        campaigns(user_id: Int!): [Campaign]
+        room: [String]
+        user_by_id(user_id: Int!): UserPublic
+    }
+
+    type Mutation {
+        register(username: String!, password: String!, email: String!): Register
+        login(username: String!, password: String!): Login
+        add_images_to_campaign(images: [String!]!, campaign_id: ID!): [String]
+        create_new_campaign(input: CampaignInput!, images: [String], perks: [PerkInput]): Campaign
+        send_message(from: String, body: String): Message
+        donate(campaign_id: Int!, amount: Float!, user_id: Int!): String
+        update_profile(input: UserInput!): DefaultResponse
+        comment(comment: CommentInput): Comment!
+    }
+
+    
+
+    type Subscription {
+        messageAdded: Message
+        donationSent(user_id: Int!): Donation
+        donationReceived(user_id: Int!): Donation
+        commentAdded(campaign_id: Int!): Comment
+    }
