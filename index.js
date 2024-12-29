@@ -27,7 +27,9 @@ const port = 8800;
 app.use(cors({origin: ["http://127.0.0.1:5500", "https://donation-campaigns-nab.vercel.app", "https://studio.apollographql.com", "http://localhost:3000"], credentials: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "10mb" }));
-
+app.get("/home", (req, res) => {
+  res.send({ message: "HELLO API WORKS" });
+});
 const httpServer = createServer(app);
 
 const wsServer = new WebSocketServer({
