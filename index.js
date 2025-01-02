@@ -24,7 +24,7 @@ const typeDefs = readFileSync(join(__dirname, 'graphql', 'schema.graphql'), 'utf
 
 const app = express();
 const port = 8800;
-app.use(cors({origin: ["https://spread-the-deed.onrender.com", "https://donation-campaigns-nab.vercel.app", "https://studio.apollographql.com", "http://localhost:3000"], credentials: true }));
+app.use(cors({origin: ["https://spread-the-deed-fe.vercel.app", "https://donation-campaigns-nab.vercel.app", "https://studio.apollographql.com", "http://localhost:3000"], credentials: true }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "10mb" }));
 
