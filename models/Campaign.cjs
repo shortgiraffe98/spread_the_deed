@@ -1,3 +1,4 @@
+const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define("Campaign", {
         id: {
@@ -16,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DECIMAL
           },
           raised_amount: {
-            type: DataTypes.DECIMAL
+            type: DataTypes.DECIMAL,
+            default: 0,
           },
           start_date: {
             type: DataTypes.DATE
@@ -32,14 +34,21 @@ module.exports = (sequelize, DataTypes) => {
           },
           createdAt: {
             allowNull: false,
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
+            default: Sequelize.NOW
           },
           updatedAt: {
             allowNull: false,
-            type: DataTypes.DATE
+            type: DataTypes.DATE,
+            default: Sequelize.NOW
           },
           comments_counter: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            default: 0
+          },
+          donations_counter: {
+            type: DataTypes.INTEGER,
+            default: 0
           }
     })
 }

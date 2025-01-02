@@ -18,6 +18,8 @@ scalar Date
 
     input UserInput {
         user_id: Int!
+        firstname: String
+        lastname: String
         email: String
         avatar: String
         profile_image: String
@@ -77,11 +79,19 @@ scalar Date
         title: String!
         description: String!
         goal_amount: Float!
-        raised_amount: Float!
         start_date: Date!
         end_date: Date!
         status: String!
-        user_id: Int!
+    }
+
+    input CampaignEditInput {
+        id: Int!
+        title: String
+        description: String
+        goal_amount: Float
+        start_date: Date
+        end_date: Date
+        status: String
     }
 
     input PerkInput {
@@ -98,6 +108,16 @@ scalar Date
         campaign_id: Int!
     }
 
+    type Image {
+        src: String!
+        id: Int!
+    }
+
+    input ImageInput {
+        src: String!
+        id: Int
+    }
+
     type Campaign {
         id: Int!
         title: String!
@@ -110,11 +130,13 @@ scalar Date
         user_id: Int!
         createdAt: Date!
         updatedAt: Date!
-        get_images: [String]
+        get_images: [Image]
         get_perks: [Perk]
         get_donations: [Donation]
         get_comments: [Comment]
+        get_user: UserPublic
         comments_counter: Int!
+        donations_counter: Int!
     }
 
     type Message {
@@ -152,11 +174,13 @@ scalar Date
         register(username: String!, password: String!, email: String!): Register
         login(username: String!, password: String!): Login
         add_images_to_campaign(images: [String!]!, campaign_id: ID!): [String]
-        create_new_campaign(input: CampaignInput!, images: [String], perks: [PerkInput]): Campaign
+        create_new_campaign(input: CampaignInput!, images: [String], perks: [PerkInput]): DefaultResponse
         send_message(from: String, body: String): Message
         donate(campaign_id: Int!, amount: Float!, user_id: Int!): String
         update_profile(input: UserInput!): DefaultResponse
         comment(comment: CommentInput): Comment!
+        updateEmail(email: String!, password: String!): DefaultResponse
+        updateCampaign(images: [ImageInput], deleted_images: [Int], deleted_perks: [Int], input: CampaignEditInput!): DefaultResponse
     }
 
     

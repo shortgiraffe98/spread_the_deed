@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { Kind } from 'graphql/language/index.js';
 import { GraphQLScalarType } from 'graphql';
 import { PubSub } from 'graphql-subscriptions';
-import { subscribe } from "diagnostics_channel";
 
 const pubSub = new PubSub();
 
@@ -54,9 +53,9 @@ export const resolvers = {
         },
         campaign(parent, args, context_auth) {
             return db.Campaign.findOne({ where: {"id": args.campaign_id} }).then((records) => {
+                console.log("campaign: ", records);
                 return records;
             }).catch((err) => {
-                
                 return err;
             })
         },
@@ -81,6 +80,14 @@ export const resolvers = {
         }
     },
     Campaign: {
+        get_user({ user_id }) {
+            return db.User.findOne({ where: { "id": user_id }}).then((user) => {
+                if (user.dataValues.avatar !== null) user.dataValues.avatar = Buffer.from(user.dataValues.avatar).toString('binary');
+                return user;
+            }).catch((err) => {
+                return err;
+            })
+        },
         get_comments(parent) {
             return db.Comment.findAll({ where: { "campaign_id": parent.id }}).then((records) => {
                 return records;
@@ -90,9 +97,8 @@ export const resolvers = {
         },
         get_images(parent, args, context) {
             return db.CampaignImage.findAll({ where: { "campaign_id": parent.id }}).then((records) => {
-                return records.map((item) => Buffer.from(item.dataValues.base64_image).toString('binary'));
+                return records.map((item) => ({ src: Buffer.from(item.dataValues.base64_image).toString('binary'), id: item.id }));
             }).catch((err) => {
-                
                 return err;
             })
         },
@@ -134,6 +140,15 @@ export const resolvers = {
             })
         }
     },
+
+
+
+
+
+
+
+
+
     Donation: {
         getUser(parent) {
             return db.User.findOne({ where: { id: parent.user_id } })
@@ -151,6 +166,21 @@ export const resolvers = {
             })
         }
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     Comment: {
         get_avatar(parent) {
             return db.User.findOne({ where: { "id": parent.user_id }}).then((record) => {
@@ -169,6 +199,30 @@ export const resolvers = {
         },
     },
     Mutation: {
+        async updateEmail(_, { email, password }, context_auth) {
+            if (!context_auth.user.isAuthenticated) {
+                return context_auth.user;
+            } else {
+                const user_id = context_auth.user.user_info.id;
+                const editedUser = await db.User.findOne({ where: { id: user_id } });
+                const trst = await db.sequelize.transaction();
+                const isValidate = await bcrypt.compare(password, editedUser.password);
+                if (isValidate) {
+                    try {
+                        const saved = await editedUser.update({ email: email }, {transaction: trst });
+                        trst.commit();
+                        console.log("saved: ", saved);
+                        return { message: "sucess", error: null };
+                    } catch (error) {
+                        trst.rollback();
+                        console.log(error);
+                        console.log("something's wrong with update profile");
+                    }
+                } else {
+                    return { error: "your password is incorrect", token: null };
+                }
+            }
+        },
         async comment(_, args, context_auth) {
             const date = db.sequelize.literal('CURRENT_TIMESTAMP');
             const currentCampaign = await db.Campaign.findOne({ where: { id: args.comment.campaign_id }});
@@ -228,35 +282,80 @@ export const resolvers = {
             await db.CampaignImage.bulkCreate(rows);
             return args.images;
         },
-        async create_new_campaign(parent, args, context_auth) {
-            const date = db.sequelize.literal('CURRENT_TIMESTAMP');
-            const newCampaign = await db.Campaign.create({ ...args.input, createdAt: date, updatedAt: date });
-            if (args.images.length > 0) {
-                const rows = args.images.map((images) => ({
-                    "base64_image": images,
-                    "createdAt": date,
-                    "updatedAt": date,
-                    "campaign_id": newCampaign.id
-                }))
-                await db.CampaignImage.bulkCreate(rows);
+        async create_new_campaign(_, args, context_auth) {
+            if (!context_auth.user.isAuthenticated) {
+                return context_auth.user;
+            } else {
+                const user_id = context_auth.user.user_info.id;
+                const trst = await db.sequelize.transaction();
+                    try {
+                        const newCampaign = await db.Campaign.create({ ...args.input, user_id: user_id }, {transaction: trst });
+                        if (args.images.length > 0) {
+                            const rows = args.images.map((images) => ({
+                                "base64_image": images,
+                                "campaign_id": newCampaign.id
+                            }))
+                            await db.CampaignImage.bulkCreate(rows, {transaction: trst });
+                        }
+                        if (args.perks.length > 0) {
+                            const rows = args.perks.map((perk) => ({
+                                "title": perk.title,
+                                "base64_image": perk.base64_image,
+                                "amount": perk.amount,
+                                "campaign_id": newCampaign.id
+                            }))
+                            await db.CampaignPerk.bulkCreate(rows);
+                        }
+                        trst.commit();
+                        return { message: "sucess", error: null };
+                    } catch (error) {
+                        trst.rollback();
+                        console.log(error);
+                        console.log("something's wrong with update profile");
+                    }
             }
-            if (args.perks.length > 0) {
-                const rows = args.perks.map((perk) => ({
-                    "title": perk.title,
-                    "base64_image": perk.base64_image,
-                    "amount": perk.amount,
-                    "createdAt": date,
-                    "updatedAt": date,
-                    "campaign_id": newCampaign.id
-                }))
-                await db.CampaignPerk.bulkCreate(rows);
-            }
-            return newCampaign;
         },
+
+        async updateCampaign(_, args, context_auth) {
+            if (!context_auth.user.isAuthenticated) {
+                return context_auth.user;
+            } else {
+                const { images, deleted_images, deleted_perks, input } = args;
+                // delete images
+                if (deleted_images.length > 0) {
+                    for (const imgId of deleted_images) {
+                        const deletedImage = await db.CampaignImage.findOne({ where: { id: imgId }});
+                        if (deletedImage !== null) await deletedImage.destroy();
+                    }
+                }
+                const editedCampaign = await db.Campaign.findOne({ where: { id: input.id } });
+                delete input.id;
+                const trst = await db.sequelize.transaction();
+                try {
+                    const saved = await editedCampaign.update(input, {transaction: trst });
+
+                    if (images.length > 0) {
+                        const rows = images.map((img) => ({
+                            "base64_image": img.src,
+                            "campaign_id": editedCampaign.id
+                        }))
+                        await db.CampaignImage.bulkCreate(rows, {transaction: trst });
+                    }
+                    trst.commit();
+                    return { message: "sucess", error: null };
+                } catch (error) {
+                    trst.rollback();
+                    console.log(error);
+                    console.log("something's wrong with update campaign");
+                }
+            }
+        },
+        
         async donate(parent, args, context_auth) {
             const currentCampaign = await db.Campaign.findOne({ where: { id: args.campaign_id } });
             if (currentCampaign === null) throw new Error("campaign not existed");
             console.log("currentCampaign: ", currentCampaign);
+            
             await pubSub.publish(`DONATION_SENT_${args.user_id}`, {
                 donationSent: { 
                     campaign_id: args.campaign_id,
@@ -275,24 +374,29 @@ export const resolvers = {
                     creator_checked: false,
                 }
             });
+            await currentCampaign.increment("donations_counter");
             return db.Donation.create({
-                amount: parseInt(args.amount),
+                amount: parseFloat(args.amount),
                 user_id: args.user_id,
                 campaign_id: parseInt(args.campaign_id)
             }).then(() => "Successfully donated")
             .catch(err => err);
         },
         async update_profile(parent, args) {
-
             const fields = args.input;
             const editedUser = await db.User.findOne({ where: { id: fields.user_id } });
             delete fields.user_id;
-            
-            // Object.keys(fields)
-            
-            await editedUser.update(fields);
-            await editedUser.save();
-            return { message: "sucess", error: null };
+            const trst = await db.sequelize.transaction();
+            try {
+                const saved = await editedUser.update(fields, {transaction: trst });
+                trst.commit();
+                console.log("saved: ", saved);
+                return { message: "sucess", error: null };
+            } catch (error) {
+                trst.rollback();
+                console.log(error);
+                console.log("something's wrong with update profile");
+            }
         }
     },
     Date: new GraphQLScalarType({

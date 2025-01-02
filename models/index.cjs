@@ -12,14 +12,7 @@ let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  sequelize = new Sequelize(process.env.INTERNAL_DB, {
-    "username": process.env.DB_USER,
-    "password": process.env.DB_PASSWORD,
-    "database": process.env.DB_NAME,
-    "host": process.env.DB_HOST,
-    "dialect": process.env.DB_DIALECT,
-    "logging": false
-  });
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 fs
   .readdirSync(__dirname)

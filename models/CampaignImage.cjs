@@ -1,3 +1,4 @@
+const Sequelize = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define("CampaignImage", {
     id: {
@@ -22,6 +23,16 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
             notEmpty: true
         }
+    },
+    createdAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+        default: Sequelize.NOW
+    },
+    updatedAt: {
+        allowNull: false,
+        type: DataTypes.DATE,
+        default: Sequelize.NOW
     },
     })
 }
