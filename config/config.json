@@ -16,10 +16,10 @@
     "logging": false
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
+    "username": "spread_the_deed_user",
+    "password": "mdS4iooXEkD3945LZRu7UaBdxZWR6GZK",
+    "database": "spread_the_deed",
+    "host": "dpg-ctfrmiogph6c73fp2vng-a",
     "dialect": "postgres",
     "logging": false
   }
