@@ -31,10 +31,10 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         profile_image: {
-            type: DataTypes.STRING,
+            type: DataTypes.BLOB("medium"),
         },
         avatar: {
-            type: DataTypes.STRING,
+            type: DataTypes.BLOB("medium"),
         },
         country: {
             type: DataTypes.STRING,
