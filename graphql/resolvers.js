@@ -198,9 +198,10 @@ export const resolvers = {
         get_fullname(parent) {
             return db.User.findOne({ where: { "id": parent.user_id }}).then((record) => {
                 let fullName = "";
-                if (record.lastname === null && record.firstname === null) { fullName = record.username }
-                else if (record.lastname === null) { fullName = record.firstname }
-                else if (record.firstname === null) { fullName = record.lastname }
+                if (record.lastname === null && record.firstname === null) { fullName = record.username; }
+                else if (record.lastname === null) { fullName = record.firstname; }
+                else if (record.firstname === null) { fullName = record.lastname; }
+                else { fullName = `${record.firstname} ${record.lastname}`; }
                 return fullName;
             }).catch((err) => {
                 return err;
