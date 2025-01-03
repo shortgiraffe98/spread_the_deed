@@ -1,5 +1,3 @@
-scalar Date    
-
     type User {
         id: Int
         username: String
@@ -124,19 +122,19 @@ scalar Date
         description: String!
         goal_amount: Float!
         raised_amount: Float
-        start_date: Date!
-        end_date: Date!
-        status: String!
+        start_date: String!
+        end_date: String!
+        status: String
         user_id: Int!
-        createdAt: Date!
-        updatedAt: Date!
+        createdAt: String!
+        updatedAt: String!
         get_images: [Image]
         get_perks: [Perk]
         get_donations: [Donation]
         get_comments: [Comment]
         get_user: UserPublic
-        comments_counter: Int!
-        donations_counter: Int!
+        comments_counter: Int
+        donations_counter: Int
     }
 
     type Message {
