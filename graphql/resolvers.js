@@ -53,7 +53,6 @@ export const resolvers = {
         },
         campaign(parent, args, context_auth) {
             return db.Campaign.findOne({ where: {"id": args.campaign_id} }).then((records) => {
-                console.log("campaign: ", records);
                 return records;
             }).catch((err) => {
                 return err;
@@ -211,11 +210,9 @@ export const resolvers = {
                     try {
                         const saved = await editedUser.update({ email: email }, {transaction: trst });
                         trst.commit();
-                        console.log("saved: ", saved);
                         return { message: "sucess", error: null };
                     } catch (error) {
                         trst.rollback();
-                        console.log(error);
                         console.log("something's wrong with update profile");
                     }
                 } else {
@@ -399,22 +396,6 @@ export const resolvers = {
             }
         }
     },
-    Date: new GraphQLScalarType({
-        name: 'Date',
-        description: 'Date custom scalar type',
-        parseValue(value) {
-            return new Date(value); // value from the client
-        },
-        serialize(value) {
-            return value.getTime(); // value sent to the client
-        },
-        parseLiteral(ast) {
-            if (ast.kind === Kind.INT) {
-            return parseInt(ast.value, 10); // ast value is always in string format
-            }
-            return null;
-        },
-    }),
     Subscription: {
         messageAdded: {
             subscribe: () => pubSub.asyncIterableIterator(['POST_CREATED']),
