@@ -184,15 +184,24 @@ export const resolvers = {
     Comment: {
         get_avatar(parent) {
             return db.User.findOne({ where: { "id": parent.user_id }}).then((record) => {
-                const avatar = Buffer.from(record.dataValues.avatar).toString('binary');
-                return avatar;
+                if (record.dataValues.avatar !== null) {
+                    const avatar = Buffer.from(record.dataValues.avatar).toString('binary');
+                    return avatar;
+                } else {
+                    return null;
+                }
+                
             }).catch((err) => {
                 return err;
             })
         },
         get_fullname(parent) {
             return db.User.findOne({ where: { "id": parent.user_id }}).then((record) => {
-                return `${record.firstname} ${record.lastname}`;
+                let fullName = "";
+                if (record.lastname === null && record.firstname === null) { fullName = record.username }
+                else if (record.lastname === null) { fullName = record.firstname }
+                else if (record.firstname === null) { fullName = record.lastname }
+                return fullName;
             }).catch((err) => {
                 return err;
             })
