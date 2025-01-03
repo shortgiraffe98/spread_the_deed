@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     },
     campaign_id: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
             notEmpty: true
