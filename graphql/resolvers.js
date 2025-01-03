@@ -96,6 +96,7 @@ export const resolvers = {
         },
         get_images(parent, args, context) {
             return db.CampaignImage.findAll({ where: { "campaign_id": parent.id }}).then((records) => {
+                console.log("GET IMAGES: ", records);
                 return records.map((item) => ({ src: Buffer.from(item.dataValues.base64_image).toString('binary'), id: item.id }));
             }).catch((err) => {
                 return err;
