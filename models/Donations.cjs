@@ -21,12 +21,12 @@ module.exports = (sequelize, DataTypes) => {
           createdAt: {
             allowNull: false,
             type: DataTypes.DATE,
-            default: Sequelize.NOW
+            defaultValue: Sequelize.NOW
           },
           updatedAt: {
             allowNull: false,
             type: DataTypes.DATE,
-            default: Sequelize.NOW
+            defaultValue: Sequelize.NOW
           },
           campaign_id: {
             type: DataTypes.INTEGER,
@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
           },
           creator_checked: {
             type: DataTypes.BOOLEAN,
-            default: false,
+            defaultValue: false,
           }
     })
 }
