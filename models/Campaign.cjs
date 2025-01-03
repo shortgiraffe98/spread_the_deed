@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
           },
           raised_amount: {
             type: DataTypes.DECIMAL,
-            default: 0,
+            defaultValue: 0,
           },
           start_date: {
             type: DataTypes.DATE
@@ -35,20 +35,20 @@ module.exports = (sequelize, DataTypes) => {
           createdAt: {
             allowNull: false,
             type: DataTypes.DATE,
-            default: Sequelize.NOW
+            defaultValue: Sequelize.NOW
           },
           updatedAt: {
             allowNull: false,
             type: DataTypes.DATE,
-            default: Sequelize.NOW
+            defaultValue: Sequelize.NOW
           },
           comments_counter: {
             type: DataTypes.INTEGER,
-            default: 0
+            defaultValue: 0
           },
           donations_counter: {
             type: DataTypes.INTEGER,
-            default: 0
+            defaultValue: 0
           }
     })
 }
