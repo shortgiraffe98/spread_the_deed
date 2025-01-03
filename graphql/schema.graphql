@@ -123,7 +123,7 @@ scalar Date
         title: String!
         description: String!
         goal_amount: Float!
-        raised_amount: Float!
+        raised_amount: Float
         start_date: Date!
         end_date: Date!
         status: String!
