@@ -56,12 +56,15 @@ module.exports = (sequelize, DataTypes) => {
         },
         contributions_counter: {
             type: DataTypes.INTEGER,
+            defaultValue: 0
         },
         campaigns_counter: {
             type: DataTypes.INTEGER,
+            defaultValue: 0
         },
         comments_counter: {
             type: DataTypes.INTEGER,
+            defaultValue: 0
         },
     })
 }
