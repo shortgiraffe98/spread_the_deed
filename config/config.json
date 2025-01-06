@@ -16,10 +16,10 @@
     "logging": false
   },
   "production": {
-    "username": "spread_the_deed_hnal_user",
-    "password": "JMSSsUJ4hI4rl8cP4XUTlgpiyLjaxLf4",
-    "database": "spread_the_deed_hnal",
-    "host": "dpg-cttugodumphs73eimbn0-a",
+    "username": "spread_the_deed_vyr4_user",
+    "password": "N50hSV4RSMhQUTBZhEYWi4QzStl1j9ia",
+    "database": "spread_the_deed_vyr4",
+    "host": "dpg-cttv1uq3esus7397c8u0-a",
     "dialect": "postgres",
     "logging": false
   }
