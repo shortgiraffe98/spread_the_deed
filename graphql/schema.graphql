@@ -1,6 +1,6 @@
-scalar Date
+scalar Date    
 
-type User {
+    type User {
         id: Int
         username: String
         email: String
@@ -14,6 +14,7 @@ type User {
         city: String
         about_me: String
         short_description: String
+        unread_notifications: Int
     }
 
     input UserInput {
@@ -48,18 +49,21 @@ type User {
     }
 
     type Donation {
-        campaign_id: Int!
-        amount: Float!
-        user_id: Int!
-        createdAt: Date!
-        creator_checked: Boolean!
+        campaign_id: Int
+        amount: Float
+        user_id: Int
+        description: String
+        createdAt: Date
+        creator_checked: Boolean
         getUser: UserPublic
+        get_fullname: String
+        get_avatar: String
     }
 
     type Comment {
-        user_id: Int!
-        comment: String!
-        createdAt: Date!
+        user_id: Int
+        comment: String
+        createdAt: Date
         get_avatar: String
         get_fullname: String
     }
@@ -95,6 +99,7 @@ type User {
     }
 
     input PerkInput {
+        id: Int
         title: String!
         amount: Float!
         base64_image: String!
@@ -126,7 +131,7 @@ type User {
         raised_amount: Float
         start_date: Date!
         end_date: Date!
-        status: String
+        status: String!
         user_id: Int!
         createdAt: Date!
         updatedAt: Date!
@@ -135,8 +140,17 @@ type User {
         get_donations: [Donation]
         get_comments: [Comment]
         get_user: UserPublic
-        comments_counter: Int
-        donations_counter: Int
+        comments_counter: Int!
+        donations_counter: Int!
+    }
+
+    type Notification {
+        transaction_id: Int
+        type: String
+        get_comment: Comment
+        get_donation: Donation
+        get_campaign: Campaign
+        createdAt: Date
     }
 
     type Message {
@@ -168,6 +182,7 @@ type User {
         campaigns(user_id: Int!): [Campaign]
         room: [String]
         user_by_id(user_id: Int!): UserPublic
+        notification: [Notification]
     }
 
     type Mutation {
@@ -176,11 +191,11 @@ type User {
         add_images_to_campaign(images: [String!]!, campaign_id: ID!): [String]
         create_new_campaign(input: CampaignInput!, images: [String], perks: [PerkInput]): DefaultResponse
         send_message(from: String, body: String): Message
-        donate(campaign_id: Int!, amount: Float!, user_id: Int!): String
+        donate(campaign_id: Int!, amount: Float!, user_id: Int!, password: String!, title: String!): DefaultResponse
         update_profile(input: UserInput!): DefaultResponse
         comment(comment: CommentInput): Comment!
         updateEmail(email: String!, password: String!): DefaultResponse
-        updateCampaign(images: [ImageInput], deleted_images: [Int], deleted_perks: [Int], input: CampaignEditInput!): DefaultResponse
+        updateCampaign(images: [ImageInput], deleted_images: [Int], deleted_perks: [Int], input: CampaignEditInput!, edited_perks: [PerkInput], new_perks: [PerkInput]): DefaultResponse
     }
 
     
@@ -190,4 +205,5 @@ type User {
         donationSent(user_id: Int!): Donation
         donationReceived(user_id: Int!): Donation
         commentAdded(campaign_id: Int!): Comment
+        notificationReceived(user_id: Int!): Notification
     }
