@@ -66,5 +66,9 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue: 0
         },
+        unread_notifications: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0
+        }
     })
 }
