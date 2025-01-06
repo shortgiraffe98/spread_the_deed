@@ -34,7 +34,7 @@ export const resolvers = {
                     if (record.dataValues.avatar !== null) record.dataValues.avatar = Buffer.from(record.dataValues.avatar).toString('binary');
                     return record;
                 }).catch((err) => {
-                    console.log("USER ERROR: ", err);
+                    
                     return err;
                 })
             }
@@ -67,6 +67,7 @@ export const resolvers = {
         },
         campaign(parent, args, context_auth) {
             return db.Campaign.findOne({ where: {"id": args.campaign_id} }).then((records) => {
+                
                 return records;
             }).catch((err) => {
                 return err;
@@ -153,7 +154,6 @@ export const resolvers = {
         },
         get_images(parent, args, context) {
             return db.CampaignImage.findAll({ where: { "campaign_id": parent.id }}).then((records) => {
-                console.log("GET IMAGES: ", records);
                 return records.map((item) => ({ src: Buffer.from(item.dataValues.base64_image).toString('binary'), id: item.id }));
             }).catch((err) => {
                 return err;
@@ -174,7 +174,6 @@ export const resolvers = {
             return db.Donation.findAll({ where: { "campaign_id": parent.id }}).then((records) => {
                 return records;
             }).catch((err) => {
-                
                 return err;
             })
         }
@@ -235,30 +234,11 @@ export const resolvers = {
         },
     },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     Comment: {
         get_avatar(parent) {
             return db.User.findOne({ where: { "id": parent.user_id }}).then((record) => {
-                if (record.dataValues.avatar !== null) {
-                    const avatar = Buffer.from(record.dataValues.avatar).toString('binary');
-                    return avatar;
-                } else {
-                    return null;
-                }
-                
+                const avatar = record.dataValues.avatar !== null ? Buffer.from(record.dataValues.avatar).toString('binary') : null;
+                return avatar;
             }).catch((err) => {
                 return err;
             })
@@ -289,10 +269,12 @@ export const resolvers = {
                     try {
                         const saved = await editedUser.update({ email: email }, {transaction: trst });
                         trst.commit();
+                        
                         return { message: "sucess", error: null };
                     } catch (error) {
                         trst.rollback();
-                        console.log("something's wrong with update profile");
+                        
+                        
                     }
                 } else {
                     return { error: "your password is incorrect", token: null };
@@ -404,7 +386,7 @@ export const resolvers = {
                     } catch (error) {
                         trst.rollback();
                         
-                        throw error;
+                        
                     }
             }
         },
